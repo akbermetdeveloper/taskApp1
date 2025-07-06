@@ -5,6 +5,8 @@ import com.example.taskApp.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @CacheEvict(value = "tasks", allEntries = true)
     public Task createTask(Task task) {
         logger.info("Создание новой задачи: {}", task.getTitle());
         Task savedTask = taskRepository.save(task);
@@ -24,6 +27,7 @@ public class TaskService {
         return savedTask;
     }
 
+    @Cacheable("tasks")
     public List<Task> getAllTasks() {
         logger.info("Получение списка всех задач");
         List<Task> tasks = taskRepository.findAll();
@@ -119,4 +123,6 @@ public class TaskService {
         logger.info("Найдено {} задач по поисковому запросу '{}'", tasks.size(), title);
         return tasks;
     }
+
+
 }
